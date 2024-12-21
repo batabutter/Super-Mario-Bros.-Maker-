@@ -20,14 +20,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Direct2D Programming\Direct2D Programming\GameController.cpp" />
-    <ClCompile Include="..\..\Direct2D Programming\Direct2D Programming\SpriteSheet.cpp" />
     <ClCompile Include="Demo.cpp" />
+    <ClCompile Include="GameController.cpp" />
     <ClCompile Include="GameLevel.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="LevelEditor.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RectObject.cpp" />
+    <ClCompile Include="SpriteSheet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Demo.h" />
