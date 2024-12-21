@@ -2,7 +2,7 @@
 
 
 /* SpriteSheet.h
-* Make sure to include windowscodecs.lib in aditional dependencies.
+* I am too lazy to document this right now. This shit is insanely complex. If you have further questions, please visit Microsoft's websites that host documentation
 */
 
 #include <wincodec.h> // Header for creating a WIC factory and reading image files from disk

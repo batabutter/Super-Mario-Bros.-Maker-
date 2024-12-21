@@ -3,20 +3,24 @@
 
 Graphics* GameLevel::graphics;
 
+// Initalize the background
 D2D1_COLOR_F GameLevel::backgroundColor = DEFAULT_BACKGROUND;
 
 void GameLevel::Init(Graphics* graphics, RectObject* obj, float charStartPosX, float charStartPosY, LevelEditor *editor)
 {
+	// Intialize the member varaibles
 	GameLevel::graphics = graphics;
 	character = *&obj;
 	levelEditor = editor;
 
-	//DEFAULT_WIDTH / DEAULT_PIXEL_INTERVAL][DEFAULT_HEIGHT / DEAULT_PIXEL_INTERVAL
+	// Create a 2D array of pixel structs
 	grid = new pixel*[DEFAULT_WIDTH / DEAULT_PIXEL_INTERVAL];
 
 	for (int i = 0; i < DEFAULT_WIDTH / DEAULT_PIXEL_INTERVAL; i++)
 		grid[i] = new pixel[DEFAULT_HEIGHT / DEAULT_PIXEL_INTERVAL];
 
+	// Reposition the character at it's starting position
+	// TODO: The rectobject now holds a stating position. This code needs to be reworked
 	character->Reposition(charStartPosX, charStartPosY);
 
 }
@@ -26,9 +30,10 @@ void GameLevel::ShowGrid()
 	float gridHeight = DEFAULT_HEIGHT;
 	float gridWidth = DEFAULT_WIDTH;
 	float pixelInterval = DEAULT_PIXEL_INTERVAL;
-
 	for (int i = 0; i < (gridWidth / pixelInterval); i++)
 	{
+
+		// Draws all the lines that outline each box of the grid
 		graphics->DrawLine(0, (i * pixelInterval), gridWidth, (i * pixelInterval), 1.0f, 0.0f, 0.0f, 0.5f);
 		graphics->DrawLine((i * pixelInterval), 0, (i * pixelInterval), gridHeight, 1.0f, 0.0f, 0.0f, 0.5f);
 	}
@@ -38,8 +43,7 @@ void GameLevel::ShowGrid()
 void GameLevel::DrawGrid()
 {
 	
-	// Next, use the grid vectors to fill in every position
-
+	// Loop through the grid array and draw each row and collumn
 	for (int i = 0; i < gridRows; i++)
 	{
 		for (int k = 0; k < gridColumns; k++)
@@ -54,18 +58,21 @@ void GameLevel::DrawGrid()
 
 void GameLevel::DrawRowCol(int row, int col)
 {
+	// Convert the grid integer positionst to find out where to draw the starting and ending pixels
 	float pixelPosLeft = ((float) row * DEAULT_PIXEL_INTERVAL);
 	float pixelPosTop = ((float) col * DEAULT_PIXEL_INTERVAL);
 	float pixelPosRight = pixelPosLeft + (float) DEAULT_PIXEL_INTERVAL;
 	float pixelPosBottom = pixelPosTop + (float) DEAULT_PIXEL_INTERVAL;
 
-	// ??? I don't know why it doesn't work when flipped, but I am too lazy to care
+	// ??? I don't know why it doesn't work when flipped, but I am too lazy to care -> "grid[col][row]"?
 	// NOTE: Rename the variables and fix later.
+	// Get the colors of the cube
 	float red = grid[col][row].color.r;
 	float green = grid[col][row].color.g;
 	float blue = grid[col][row].color.b;
 	float alpha = grid[col][row].color.a;
 
+	// Draw the cube [ ] 
 	graphics->DrawRectangle(pixelPosLeft, pixelPosTop, pixelPosRight, pixelPosBottom, red, green, blue, alpha, true);
 
 }
@@ -77,25 +84,26 @@ int* GameLevel::RectObjectToGridCoords(RectObject &obj)
 	float top = obj.GetTop();
 	float bottom = obj.GetBottom();
 
-	/*
+	/* The corresponding array positions for the coords array are -> 
 	* Coords[0] = left
 	* Coords[1] = top
 	* Coords[2] = right
 	* Coords[3] = bottom
 	*/
 
+	// Create the array
 	int *coords = new int[4]{ (int) (left/ DEAULT_PIXEL_INTERVAL), (int)(top / DEAULT_PIXEL_INTERVAL), (int)(right / DEAULT_PIXEL_INTERVAL), (int)(bottom / DEAULT_PIXEL_INTERVAL) };
-
 
 	return coords;
 }
 
-
+// TODO: These "move" methods does not check for any moveable objects. Overall functionality for those is extremley lacking > 
 void GameLevel::MoveUp()
 {
 	int* coords = RectObjectToGridCoords(*character);
 	coords[1] = coords[1] - 1;
 
+	// Check if the coordinates from the character will collide with the box or other static objects
 	if ((coords[1] >= 0) && !(WillCollide(coords)))
 		character->Reposition(character->GetLeft(), character->GetTop() - DEAULT_PIXEL_INTERVAL);
 
@@ -107,6 +115,7 @@ void GameLevel::MoveDown()
 	int* coords = RectObjectToGridCoords(*character);
 	coords[3] = coords[3] + 1;
 
+	// Check if the coordinates from the character will collide with the box or other static objects
 	if ((coords[3] <= gridRows) && !(WillCollide(coords)))
 		character->Reposition(character->GetLeft(), character->GetTop() + DEAULT_PIXEL_INTERVAL);
 
@@ -118,6 +127,7 @@ void GameLevel::MoveLeft()
 	int* coords = RectObjectToGridCoords(*character);
 	coords[0] = coords[0] - 1;
 
+	// Check if the coordinates from the character will collide with the box or other static objects
 	if ((coords[0] >= 0) && !(WillCollide(coords)))
 		character->Reposition(character->GetLeft() - DEAULT_PIXEL_INTERVAL, character->GetTop());
 
@@ -129,6 +139,7 @@ void GameLevel::MoveRight()
 	int* coords = RectObjectToGridCoords(*character);
 	coords[2] = coords[2] + 1;
 
+	// Check if the coordinates from the character will collide with the box or other static objects
 	if ((coords[2] <= gridColumns) && !(WillCollide(coords)))
 		character->Reposition(character->GetLeft() + DEAULT_PIXEL_INTERVAL, character->GetTop());
 
@@ -149,7 +160,8 @@ void GameLevel::DrawRectObject(RectObject* rect)
 
 	float alpha = rect->GetAlpha();
 
-	// Improve this to draw the actual sprite of the character
+	// use the coorindates to draw the object
+	// TODO: Improve this to draw the actual sprite of the character
 	graphics->DrawRectangle(left, top, right, bottom, red, green, blue, alpha, true);
 
 }

@@ -1,5 +1,9 @@
 #include "SpriteSheet.h"
 
+/* SpriteSheet.cpp
+* I am too lazy to document this right now. This shit is insanely complex. If you have further questions, please visit Microsoft's websites that host documentation
+*/
+
 SpriteSheet::SpriteSheet(const wchar_t* filename, Graphics* graphics)
 {
 	this->graphics = graphics;	// initalize the graphics 
