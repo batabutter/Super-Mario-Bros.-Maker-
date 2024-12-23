@@ -11,19 +11,20 @@
 */
 
 // Default height and width for the grid. VERY SUBJECT TO CHANGE
-const int DEFAULT_HEIGHT = 500;
-const int DEFAULT_WIDTH = 500;
+const int DEFAULT_HEIGHT = 512;
+const int DEFAULT_WIDTH = 512;
 
 // The amount of pixels from segment to segment of the grid
-const int DEAULT_PIXEL_INTERVAL = 10;
+const int DEAULT_PIXEL_INTERVAL = 16;
 
 // The default background color of the grid will be white for now
-#define DEFAULT_BACKGROUND D2D1::ColorF(1.0f, 1.0f, 1.0f)
+#define DEFAULT_BACKGROUND D2D1::ColorF(0.572f, 0.564f, 1.0f)
 
 /* pixel
 * Abstract representation of a pixel. Stores an rgb value and if it is current "occupied," basically if it is either the background or not.
 */
-struct pixel {
+struct pixel 
+{
 	bool occupied = false;
 	D2D1_COLOR_F color = DEFAULT_BACKGROUND;
 };
@@ -70,6 +71,9 @@ protected:
 	// Reference to the current player object
 	RectObject* character;
 
+	// //Sprite (image) of the map itself 
+	SpriteSheet* map;
+
 public:
 
 	// Background color of the window
@@ -105,20 +109,16 @@ public:
 	void DrawCharacter();
 
 	// MoveUp():
-	// Moves the playable character up
-	void MoveUp();
+	bool MoveUp(int framesHeld, RectObject *obj);
 
 	// MoveDown():
-	// Moves the playable character down
-	void MoveDown();
+	bool MoveDown(int framesHeld, RectObject* obj);
 
 	// MoveRight():
-	// Moves the playable character right
-	void MoveRight();
+	bool MoveRight(int framesHeld, RectObject* obj);
 
 	// MoveLeft():
-	// Moves the playable character left
-	void MoveLeft();
+	bool MoveLeft(int framesHeld, RectObject* obj);
 
 	// DrawRectObject(RectObject* rect):
 	// Given a RectObject, we simply draw it onto the window
@@ -148,4 +148,6 @@ public:
 	// GetGrid():
 	// Returns a reference to this level's grid object
 	pixel** GetGrid() { return grid; }
+
+	RectObject* GetCharacter() { return character; }
 };

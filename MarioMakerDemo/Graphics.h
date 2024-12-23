@@ -27,7 +27,7 @@ public:
 	ID2D1RenderTarget* GetRenderTarget() { return renderTarget; }
 
 	// Begins drawing for the renderTarget
-	void BeginDraw() { renderTarget->BeginDraw(); }
+	void BeginDraw() { if (renderTarget != nullptr) renderTarget->BeginDraw(); }
 	//In order to properly update, call this function when you finiah drawing.
 	void EndDraw() { renderTarget->EndDraw(); }
 

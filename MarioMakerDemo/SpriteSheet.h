@@ -15,6 +15,8 @@ private:
 	Graphics* graphics; // Reference to the graphics class
 	ID2D1Bitmap* bmp;	// Bitmap. Loaded file that is converted
 
+	const wchar_t* filename;
+
 	int spriteWidth, spriteHeight;
 	int spritesAcross;
 
@@ -30,5 +32,7 @@ public:
 	// Draw the bitmap to the render target
 	void Draw();
 	void Draw(int index, int x, int y);
+
+	const wchar_t * GetFilename() { return filename; }
 
 };

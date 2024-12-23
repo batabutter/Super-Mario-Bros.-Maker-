@@ -41,7 +41,9 @@ void GameController::Render()
 		return;
 
 	// If not loading, render the level
-	currentLevel->Render();
+
+	if (currentLevel != nullptr)
+		currentLevel->Render();
 }
 
 
@@ -51,6 +53,8 @@ void GameController::Update()
 	// If not loading, update the level
 	if (loading)
 		return;
+
+	if (currentLevel != nullptr)
 	currentLevel->Update();
 }
 

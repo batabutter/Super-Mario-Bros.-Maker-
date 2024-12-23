@@ -7,14 +7,16 @@ void Demo::Load()
 {
 	// Initialize the sprite sheet.
 	// NOTE: The variable "sprites" is **intended** to hold the sprites for the character, but this decision is likely to be overhauled.
-	sprites = new SpriteSheet(L"test.png", graphics, 16, 16);
+	map = new SpriteSheet(L"test.png", graphics, 16, 16);
+
+	character->Load(graphics);
 }
 
 
 void Demo::Unload()
 {
 	// Delete sprites variable from memory
-	delete sprites;
+	delete map;
 }
 
 void Demo::Render()
@@ -27,7 +29,7 @@ void Demo::Render()
 	
 	// TEST RECTANGLE TO BE DRAWN. USED FOR DEMO PURPOSES ONLY:
 	// Draws the outline of a green rectangle
-	graphics->DrawRectangle(80, 50, 180, 150, 0.0f, 1.0f, 0.0f, 0.3f, false);
+	//graphics->DrawRectangle(80, 50, 180, 150, 0.0f, 1.0f, 0.0f, 0.3f, false);
 
 	// Draws the playable character
 	DrawCharacter();
@@ -44,6 +46,7 @@ void Demo::Render()
 // Not implemented for demo
 void Demo::Update()
 {
+
 }
 
 // Deconstructor:

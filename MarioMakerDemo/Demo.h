@@ -13,7 +13,7 @@ private:
 
 	// Sprites needed to be held for the level. 
 	// TODO: Move these to the super class. 
-	SpriteSheet* sprites;
+	SpriteSheet* map;
 
 
 public:

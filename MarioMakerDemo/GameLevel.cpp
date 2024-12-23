@@ -16,6 +16,7 @@ void GameLevel::Init(Graphics* graphics, RectObject* obj, float charStartPosX, f
 	// Create a 2D array of pixel structs
 	grid = new pixel*[DEFAULT_WIDTH / DEAULT_PIXEL_INTERVAL];
 
+
 	for (int i = 0; i < DEFAULT_WIDTH / DEAULT_PIXEL_INTERVAL; i++)
 		grid[i] = new pixel[DEFAULT_HEIGHT / DEAULT_PIXEL_INTERVAL];
 
@@ -98,52 +99,154 @@ int* GameLevel::RectObjectToGridCoords(RectObject &obj)
 }
 
 // TODO: These "move" methods does not check for any moveable objects. Overall functionality for those is extremley lacking > 
-void GameLevel::MoveUp()
+/*
+* THESE METHODS ARE SO REPETITIVE, FIX THIS ASAP. 
+* Literally just add a copy constructor
+*/
+bool GameLevel::MoveUp(int framesHeld, RectObject* obj)
 {
-	int* coords = RectObjectToGridCoords(*character);
-	coords[1] = coords[1] - 1;
 
-	// Check if the coordinates from the character will collide with the box or other static objects
-	if ((coords[1] >= 0) && !(WillCollide(coords)))
-		character->Reposition(character->GetLeft(), character->GetTop() - DEAULT_PIXEL_INTERVAL);
 
-	delete[] coords;
+	bool result =true;
+
+	obj->MoveUp(framesHeld);
+
+	if (obj->yVelocity.current >= 0)
+		result = false;
+
+
+	return result;
 }
 
-void GameLevel::MoveDown()
+bool GameLevel::MoveDown(int framesHeld, RectObject* obj)
 {
-	int* coords = RectObjectToGridCoords(*character);
-	coords[3] = coords[3] + 1;
 
-	// Check if the coordinates from the character will collide with the box or other static objects
-	if ((coords[3] <= gridRows) && !(WillCollide(coords)))
-		character->Reposition(character->GetLeft(), character->GetTop() + DEAULT_PIXEL_INTERVAL);
+	bool result = false;
+	RectObject* temp = new RectObject(*obj);
 
-	delete[] coords;
+	temp->MoveDown(framesHeld);
+
+	/*
+	wchar_t charBuffer[256];
+
+	swprintf(charBuffer, 256, L"tempvel: %f\n", temp->yVelocity.current);
+	OutputDebugString(charBuffer);
+
+	swprintf(charBuffer, 256, L"obj vel before: %f\n", obj->yVelocity.current);
+	OutputDebugString(charBuffer);
+
+	*/
+
+
+	//int* coords = RectObjectToGridCoords(*temp);
+	//coords[2] = coords[2] + 1;
+
+	if (temp->GetBottom() < DEFAULT_HEIGHT)
+	{
+		obj->Reposition(temp->GetLeft(), temp->GetTop());
+		obj->yVelocity.current = temp->yVelocity.current;
+		result = true;
+	}
+	else {
+		obj->Reposition(temp->GetLeft(), DEFAULT_HEIGHT - temp->GetLength());
+		obj->yVelocity.current = 0;
+	}
+
+	/*
+	swprintf(charBuffer, 256, L"obj vel after: %f\n", obj->yVelocity.current);
+	OutputDebugString(charBuffer);
+	*/
+
+	delete temp;
+	//delete[] coords;
+
+	/*
+	swprintf(charBuffer, 256, L"final: %f\n", obj->yVelocity.current);
+	OutputDebugString(charBuffer);
+	*/
+	return result;
+	return result;
 }
 
-void GameLevel::MoveLeft()
+bool GameLevel::MoveLeft(int framesHeld, RectObject* obj)
 {
-	int* coords = RectObjectToGridCoords(*character);
-	coords[0] = coords[0] - 1;
+	bool result = false;
+	RectObject* temp = new RectObject(*obj);
 
-	// Check if the coordinates from the character will collide with the box or other static objects
-	if ((coords[0] >= 0) && !(WillCollide(coords)))
-		character->Reposition(character->GetLeft() - DEAULT_PIXEL_INTERVAL, character->GetTop());
+	temp->MoveLeft(framesHeld);
 
-	delete[] coords;
+	// Check this >
+
+	MoveDown(framesHeld, obj);
+
+	wchar_t charBuffer[256];
+
+	swprintf(charBuffer, 256, L"tempvel: %f\n", temp->xVelocity.current);
+	OutputDebugString(charBuffer);
+
+	swprintf(charBuffer, 256, L"obj vel before: %f\n", obj->xVelocity.current);
+	OutputDebugString(charBuffer);
+
+
+	//int* coords = RectObjectToGridCoords(*temp);
+	//coords[2] = coords[2] + 1;
+
+	if (temp->GetLeft() > 0)
+	{
+		obj->Reposition(temp->GetLeft(), obj->GetTop());
+		obj->xVelocity.current = temp->xVelocity.current;
+		result = true;
+	}
+	else {
+		obj->Reposition(0, obj->GetTop());
+		obj->xVelocity.current = 0;
+	}
+
+	swprintf(charBuffer, 256, L"obj vel after: %f\n", obj->xVelocity.current);
+	OutputDebugString(charBuffer);
+
+	delete temp;
+	//delete[] coords;
+
+	swprintf(charBuffer, 256, L"final: %f\n", obj->xVelocity.current);
+	OutputDebugString(charBuffer);
+
+	return result;
 }
 
-void GameLevel::MoveRight()
+bool GameLevel::MoveRight(int framesHeld, RectObject* obj)
 {
-	int* coords = RectObjectToGridCoords(*character);
-	coords[2] = coords[2] + 1;
+	bool result = false;
+	RectObject* temp = new RectObject(*obj);
 
-	// Check if the coordinates from the character will collide with the box or other static objects
-	if ((coords[2] <= gridColumns) && !(WillCollide(coords)))
-		character->Reposition(character->GetLeft() + DEAULT_PIXEL_INTERVAL, character->GetTop());
+	temp->MoveRight(framesHeld);
 
-	delete[] coords;
+	// Check this >
+
+	MoveDown(framesHeld, obj);
+
+
+	//int* coords = RectObjectToGridCoords(*temp);
+	//coords[2] = coords[2] + 1;
+
+	wchar_t charBuffer[256];
+
+	if (temp->GetRight() < DEFAULT_WIDTH)
+	{
+		obj->Reposition(temp->GetLeft(), temp->GetTop());
+		obj->xVelocity.current = temp->xVelocity.current;
+		result = true;
+	}
+	else {
+		obj->Reposition(DEFAULT_WIDTH - temp->GetWidth(), temp->GetTop());
+		obj->xVelocity.current = 0;
+	}
+
+	delete temp;
+	//delete[] coords;
+
+	
+	return result;
 }
 
 void GameLevel::DrawRectObject(RectObject* rect)
@@ -164,6 +267,7 @@ void GameLevel::DrawRectObject(RectObject* rect)
 	// TODO: Improve this to draw the actual sprite of the character
 	graphics->DrawRectangle(left, top, right, bottom, red, green, blue, alpha, true);
 
+	rect->Draw();
 }
 
 void GameLevel::DrawCharacter()
