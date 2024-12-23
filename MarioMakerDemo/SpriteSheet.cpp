@@ -6,6 +6,7 @@
 
 SpriteSheet::SpriteSheet(const wchar_t* filename, Graphics* graphics)
 {
+
 	this->filename = filename;
 
 	this->graphics = graphics;	// initalize the graphics 

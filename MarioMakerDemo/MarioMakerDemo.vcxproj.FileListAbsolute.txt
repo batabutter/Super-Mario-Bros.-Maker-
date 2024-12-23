@@ -1,0 +1,4 @@
+C:\Users\ipiby\Documents\Visual Studio Development Space\Test Projects\MarioMakerDEMO\MarioMakerDemo\MarioMakerDemo.vcxproj.MdMergeInputs.cache
+C:\Users\ipiby\Documents\Visual Studio Development Space\Test Projects\MarioMakerDEMO\MarioMakerDemo\MarioMakerDemo.vcxproj.cppwinrt_plat.cache
+C:\Users\ipiby\Documents\Visual Studio Development Space\Test Projects\MarioMakerDEMO\MarioMakerDemo\MarioMakerDemo.vcxproj.cppwinrt_comp.cache
+C:\Users\ipiby\Documents\Visual Studio Development Space\Test Projects\MarioMakerDEMO\MarioMakerDemo\MarioMakerDemo.exe

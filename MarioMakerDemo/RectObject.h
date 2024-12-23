@@ -3,27 +3,22 @@
 #include "SpriteSheet.h"
 #include "Graphics.h"
 
-const float CHARACTER_MOVE_BY = 10.0f;
-const float DEFAULT_TARGET_VELOCITY = 10.0f;
-
-const float DEFAULT_MARIO_MOVEMENT_ACCELERATION = 0.5f;
-const float DEFAULT_MARIO_GRAVITY_ACCELERATION = 0.01f;
-
-const float DEFAULT_MARIO_JUMP_VELOCITY = -10.0f;
-
 class RectObject
 {
 
 public:
+	virtual const char* GetClassName() { return "RectObject"; }
+
 	struct velocity
 	{
 		float current;
 		float target;
 
 		float currDir = 1.0f;
+
 	};
 
-private:
+protected:
 	float xLeft = 0;
 	float xRight = xLeft + width;
 	float yTop = 0;
@@ -41,12 +36,17 @@ private:
 
 	bool moveable;
 
+
 public:
 
-	velocity xVelocity = { 0.0f, DEFAULT_TARGET_VELOCITY };
-	velocity yVelocity = { 0.0f, DEFAULT_TARGET_VELOCITY };
+	velocity xVelocity = { 0.0f, 0.0f};
+	velocity yVelocity = { 0.0f, 0.0f};
 
-	RectObject(float length, float width, float left, float top, bool moveable) { this->length = length; this->width = width; this->moveable = moveable; Reposition(left, top); };
+	bool isFalling = false;
+	int timeSpentFalling = 0;
+
+	RectObject(float length, float width, float left, float top, bool moveable) 
+{ this->length = length; this->width = width; this->moveable = moveable; Reposition(left, top); };
 
 	RectObject(float length, float width, float left, float top, float r, float g, float b, float a, bool moveable) : RectObject(length, width, left, top, moveable)
 		{ this->r = r; this->g = g; this->b = b; this->a = a; };
@@ -78,11 +78,14 @@ public:
 
 	bool isMoveable() { return moveable; }
 
-	bool Load(Graphics *gfx);
+	bool Load(Graphics* gfx, const wchar_t* spriteFilename);
+	bool Unload();
 	bool Draw();
 
-	void MoveRight(int acceleration);
-	void MoveLeft(int acceleration);
-	void MoveDown(int acceleration);
-	void MoveUp(int acceleration);
+	virtual bool MoveRight(int frame, bool holdingDown) { return false; };
+	virtual bool MoveLeft(int frame, bool holdingDown) { return false; };
+	virtual bool MoveDown(int frame, bool holdingDown) { return false; };
+	virtual bool MoveUp(int frame, bool holdingDown) { return false; };
+
+	virtual bool FreeFall(int frame) { return false;};
 };

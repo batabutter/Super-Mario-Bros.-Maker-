@@ -7,9 +7,10 @@ void Demo::Load()
 {
 	// Initialize the sprite sheet.
 	// NOTE: The variable "sprites" is **intended** to hold the sprites for the character, but this decision is likely to be overhauled.
-	map = new SpriteSheet(L"test.png", graphics, 16, 16);
+	//map = new SpriteSheet(L"test.png", graphics, 16, 16);
 
-	character->Load(graphics);
+
+	character->Load(graphics, L"mario.png");
 }
 
 

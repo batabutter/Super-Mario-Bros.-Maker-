@@ -15,27 +15,10 @@
 #define WINDOW_WIDTH 800
 
 /* main.cpp
-* Ensure you are linking to hte d2d1 library
-*
+* Make sure to check the imported libraries within the Solution's directory if any copies of code are made.
 */
-static float xStart = 256.0f;
-static float yStart = 256.0f;
-
-// Creating mario 
-static RectObject *character = new RectObject(32.0f, 24.0f, 64.0f, 64.0f, 0.0f, 1.0f, 0.0f, 1.0f, true);
-
-static RectObject *block = new RectObject(100.0f, 100.0f, 80.0f, 50.0f, 0.0f, 0.0f, 0.0f, 1.0f, false);
-static Demo *level1 = new Demo();
-
-// Create singleton LevelEditor
-static LevelEditor *levelEditor = LevelEditor::GetInstance();
-
-// Create singleton Input handler
-
-Graphics* graphics;
-
-static bool wasDown = false;
-static bool isDown = false;
+static Demo* level1 = new Demo();
+static GameController* game = GameController::GetInstance();
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -43,6 +26,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR lpCmdLine, int nCmdShow)
 {
 	const wchar_t* CLASS_NAME = L"Window";
+
+	const wchar_t* GAME_NAME = L"Mario Maker Demo";
 
 	WNDCLASS wc = { };
 
@@ -59,7 +44,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	HWND windowHandle = CreateWindowEx(
 		0,                              // Optional window styles.
 		CLASS_NAME,                     // Window class
-		L"Mario Maker Demo",    // Window text
+		GAME_NAME,    // Window text
 		WS_OVERLAPPEDWINDOW,            // Window style
 
 		// Size and position
@@ -74,97 +59,40 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (windowHandle == NULL)
 		return -1;
 
-	/* Recreate this. This is so messy and all the window creating fuctions make it really hard to know where and what to edit
-	*/
-
-	float myFloat = character->GetRight();
-
-	graphics = new Graphics();
-
-	if (!graphics->Init(windowHandle)) {
-		delete graphics;
-		return -1;
-	}
-
-	// This is dumb, stupid and ugly. 
-	level1->Init(graphics, character, xStart, yStart, levelEditor);
-
-	//level1->AppendStaticRectObject(block);
-
-
-	// Initialize the level editor and the input
-
-	levelEditor->Init(graphics);
-	Input::Init(level1);
-
-
-	ShowWindow(windowHandle, nCmdShow);
-
-	// Call the GameController which calls the level's load functions
-	GameController::LoadInitialLevel(level1);
 
 	MSG message = {};
 	message.message = WM_NULL;
 
-	// Peeks messages so the program isn't constatnly waiting for input
+	int result = 1;
+
+	ShowWindow(windowHandle, nCmdShow);
+
+	result = GameController::Init(windowHandle);
+
+	if (result == -1)
+		return -1;
+
+	GameController::LoadInitialLevel(level1);
+
 	while (message.message != WM_QUIT)
 	{
-		auto now = std::chrono::high_resolution_clock::now();
 
-		auto lastUpdate = std::chrono::high_resolution_clock::now();
+		result = game->UpdateGame();
 
-		auto deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastUpdate);
+		if (result == -1)
+			return result;
 
-		if (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-		{
-
-			DispatchMessage(&message);
-		}
-
-		while (deltaTime.count() <= 16.0f)
-		{
-
-			Input::ProcessKeyboardInput(Input::keyboard.lastKeyPressed, wasDown, isDown, level1->GetCharacter());
-
-			GameController::Update();
-			graphics->BeginDraw();
-			GameController::Render();
-			graphics->EndDraw();
-
-			now = std::chrono::high_resolution_clock::now();
-			deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastUpdate);
-		}
-
-
-		if (isDown)
-			OutputDebugString(L"IsDown");
-
-		/*
 		if (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
 		{
 			DispatchMessage(&message);
 		}
-		else
-		{
-			GameController::Update();
-			graphics->BeginDraw();
-			GameController::Render();
-			graphics->EndDraw();
-		}
-		*/
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 	}
 
-	delete graphics;
-	
-	/*
-	
-	// Make sure to delete the rest of the stuff
-	
-	*/
 
-	return 0;
+	GameController::GetInstance()->~GameController();
+
+	return result;
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -185,7 +113,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		ReleaseCapture();
 
-		levelEditor->FreeSelectedObject();
+		//levelEditor->FreeSelectedObject();
 		break;
 
 	case WM_LBUTTONDOWN:
@@ -194,7 +122,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		ptInitialClick.y = GET_Y_LPARAM(lParam);
 		SetCapture(hwnd);
 
-		levelEditor->ProcessMouseInput(ptInitialClick.x, ptInitialClick.y);
+		//levelEditor->ProcessMouseInput(ptInitialClick.x, ptInitialClick.y);
 		break;
 
 
@@ -204,6 +132,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		ptCurrent.x = GET_X_LPARAM(lParam);
 		ptCurrent.y = GET_Y_LPARAM(lParam);
 
+
+		// Old Code. Rewrite this when you have the time
+
+		/*
 
 		// Note:: This is kind of a band-aid fix and I don't like it. Freeing and reassigning to bullptr is stupid, but I will fix this later. 
 		if (DragDetect(hwnd, ptCurrent)) {
@@ -215,8 +147,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			level1->AppendStaticRectObject(levelEditor->GetSelectedObject());
 			levelEditor->FreeSelectedObject();
 		}
-
-
+		*/
 
 		break;
 	
@@ -226,18 +157,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 	{
 		// These operators use the properties of lParam and how the bits are ordered.
-		wasDown = (lParam & (1 << 30)) != 0;
-		isDown = (lParam & (1 << 31)) == 0;
+		GameController::wasKeyDown = (lParam & (1 << 30)) != 0;
+		GameController::isKeyDown = (lParam & (1 << 31)) == 0;
 
 		uint32_t VKCode = wParam;
 		Input::keyboard.lastKeyPressed = VKCode;
 
 		break;
 	}
-	
 
 	}
-
 
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

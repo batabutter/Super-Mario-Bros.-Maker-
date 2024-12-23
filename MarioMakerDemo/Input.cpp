@@ -21,31 +21,22 @@ void Input::ProcessKeyboardInput(uint32_t VKCode, bool wasDown, bool isDown, Rec
 			keyboard.keys[DC_UP].isDown = isDown;
 			keyboard.keys[DC_UP].wasDown = wasDown;
 
-			if (keyboard.keys[DC_UP].isDown && keyboard.keys[DC_UP].wasDown)
+			if (keyboard.keys[DC_UP].isDown && !obj->isFalling)
 			{
+				keyboard.keys[DC_UP].framesReleased = 0;
+
 				keyboard.keys[DC_UP].framesHeld++;
-				successfulMove = currLevel->MoveUp(keyboard.keys[DC_UP].framesHeld, obj);
+				successfulMove = currLevel->MoveUp(keyboard.keys[DC_UP].framesHeld, obj, keyboard.keys[DC_UP].isDown);
 				keyboard.keys[DC_UP].successfulMove = successfulMove;
 
-				if (!successfulMove)
-				{
-					keyboard.keys[DC_DOWN].framesHeld = 0;
-					keyboard.keys[DC_DOWN].successfulMove = true;
-				}
-				else
-				{
-					return;
-				}
+				if (!keyboard.keys[DC_UP].successfulMove)
+					obj->isFalling = true;
+
 			}
-			else
+			else 
 			{
-
 				keyboard.keys[DC_UP].framesHeld = 0;
-
-
-				keyboard.keys[DC_DOWN].successfulMove = true;
-				keyboard.keys[DC_DOWN].framesHeld++;
-				currLevel->MoveDown(keyboard.keys[DC_DOWN].framesHeld, obj);
+				obj->isFalling = true;
 			}
 
 			break;
@@ -65,14 +56,15 @@ void Input::ProcessKeyboardInput(uint32_t VKCode, bool wasDown, bool isDown, Rec
 
 			if (keyboard.keys[DC_LEFT].isDown)
 			{
-				keyboard.keys[DC_LEFT].framesHeld++;
-				successfulMove = currLevel->MoveLeft(keyboard.keys[DC_LEFT].framesHeld, obj);
 
-				return;
+				keyboard.keys[DC_LEFT].framesReleased = 0;
+				keyboard.keys[DC_LEFT].framesHeld++;
+				successfulMove = currLevel->MoveLeft(keyboard.keys[DC_LEFT].framesHeld, obj, keyboard.keys[DC_LEFT].isDown);
+
 			}
 			else 
 			{
-				keyboard.keys[DC_RIGHT].framesHeld = 0;
+				keyboard.keys[DC_LEFT].framesHeld = 0;
 			}
 
 			break;
@@ -84,12 +76,12 @@ void Input::ProcessKeyboardInput(uint32_t VKCode, bool wasDown, bool isDown, Rec
 
 			if (keyboard.keys[DC_RIGHT].isDown)
 			{
+				keyboard.keys[DC_RIGHT].framesReleased = 0;
 				//OutputDebugString(L"Moving right");
 
 				keyboard.keys[DC_RIGHT].framesHeld++;
-				successfulMove = currLevel->MoveRight(keyboard.keys[DC_RIGHT].framesHeld, obj);
+				successfulMove = currLevel->MoveRight(keyboard.keys[DC_RIGHT].framesHeld, obj, keyboard.keys[DC_RIGHT].isDown);
 
-				return;
 			}
 			else 
 			{
@@ -102,20 +94,28 @@ void Input::ProcessKeyboardInput(uint32_t VKCode, bool wasDown, bool isDown, Rec
 		// This code is a little wonky, but I can fix it later
 		if (obj->xVelocity.current > 0 && !keyboard.keys[DC_RIGHT].isDown)
 		{
-			//obj->MoveRight(-2.5f);
-			currLevel->MoveRight(-2.5f, obj);
+			keyboard.keys[DC_RIGHT].framesReleased++;
+			currLevel->MoveRight(keyboard.keys[DC_RIGHT].framesReleased, obj, keyboard.keys[DC_RIGHT].isDown);
 		}
 
 		if (obj->xVelocity.current < 0 && !keyboard.keys[DC_LEFT].isDown)
 		{
 			// Experiment with this, but I think it has a minor bug
-			currLevel->MoveLeft(-2.5f, obj);
+
+			OutputDebugString(L"Trying to update > ");
+
+			wchar_t charBuffer[256];
+
+			swprintf(charBuffer, 256, L" final lvel: %f\n", obj->xVelocity.current);
+			OutputDebugString(charBuffer);
+
+			keyboard.keys[DC_LEFT].framesReleased++;
+			currLevel->MoveLeft(keyboard.keys[DC_LEFT].framesReleased, obj, keyboard.keys[DC_LEFT].isDown);
 		}
 
-		if (!keyboard.keys[DC_UP].isDown && keyboard.keys[DC_DOWN].successfulMove) {
-			keyboard.keys[DC_DOWN].framesHeld++;
-			successfulMove = currLevel->MoveDown(keyboard.keys[DC_DOWN].framesHeld, obj);
-			keyboard.keys[DC_DOWN].successfulMove = successfulMove;
+		if (obj->isFalling) {
+			obj->timeSpentFalling++;
+			successfulMove = currLevel->FreeFall(obj->timeSpentFalling++, obj);
 		}
 
 		if (!keyboard.keys[DC_DOWN].successfulMove)

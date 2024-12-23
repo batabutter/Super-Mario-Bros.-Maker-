@@ -30,6 +30,7 @@ public:
 	{
 		bool wasDown, isDown;
 		int framesHeld = 0;
+		int framesReleased = 0;
 
 		bool successfulMove = true;
 	};

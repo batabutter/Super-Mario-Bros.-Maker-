@@ -27,7 +27,8 @@ public:
 	LevelEditor(const LevelEditor&) = delete;
 	LevelEditor& operator=(const LevelEditor&) = delete;
 
-	~LevelEditor() { delete instance;  for (int i = 0; i < builderObjects.size(); i++) delete  builderObjects.at(i); }
+	// Rework this
+	~LevelEditor() {  }
 
 	void Init(Graphics* gfx);
 	static LevelEditor* GetInstance() { if (instance == nullptr) instance = new LevelEditor(); return instance; }

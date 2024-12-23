@@ -2,6 +2,7 @@
 #include "Graphics.h"
 #include "SpriteSheet.h"
 #include "RectObject.h"
+#include "RectObjectFactory.h"
 #include "LevelEditor.h"
 #include <vector>
 
@@ -109,16 +110,18 @@ public:
 	void DrawCharacter();
 
 	// MoveUp():
-	bool MoveUp(int framesHeld, RectObject *obj);
+	bool MoveUp(int framesHeld, RectObject *obj, bool holdingDown);
 
 	// MoveDown():
-	bool MoveDown(int framesHeld, RectObject* obj);
+	bool MoveDown(int framesHeld, RectObject* obj, bool holdingDown);
 
 	// MoveRight():
-	bool MoveRight(int framesHeld, RectObject* obj);
+	bool MoveRight(int framesHeld, RectObject* obj, bool holdingDown);
 
 	// MoveLeft():
-	bool MoveLeft(int framesHeld, RectObject* obj);
+	bool MoveLeft(int framesHeld, RectObject* obj, bool holdingDown);
+
+	bool FreeFall(int framesHeld, RectObject* obj);
 
 	// DrawRectObject(RectObject* rect):
 	// Given a RectObject, we simply draw it onto the window

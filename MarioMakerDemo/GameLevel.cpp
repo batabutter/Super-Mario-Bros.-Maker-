@@ -103,28 +103,22 @@ int* GameLevel::RectObjectToGridCoords(RectObject &obj)
 * THESE METHODS ARE SO REPETITIVE, FIX THIS ASAP. 
 * Literally just add a copy constructor
 */
-bool GameLevel::MoveUp(int framesHeld, RectObject* obj)
+bool GameLevel::MoveUp(int framesHeld, RectObject* obj, bool holdingDown)
 {
+	bool canMoveUp = true;
+	canMoveUp = obj->MoveUp(framesHeld, holdingDown);
 
 
-	bool result =true;
-
-	obj->MoveUp(framesHeld);
-
-	if (obj->yVelocity.current >= 0)
-		result = false;
-
-
-	return result;
+	return canMoveUp;
 }
 
-bool GameLevel::MoveDown(int framesHeld, RectObject* obj)
+bool GameLevel::MoveDown(int framesHeld, RectObject* obj, bool holdingDown)
 {
 
 	bool result = false;
-	RectObject* temp = new RectObject(*obj);
+	RectObject* temp = RectObjectFactory::CreateNewRectObject(obj);
 
-	temp->MoveDown(framesHeld);
+	temp->MoveDown(framesHeld, holdingDown);
 
 	/*
 	wchar_t charBuffer[256];
@@ -165,27 +159,53 @@ bool GameLevel::MoveDown(int framesHeld, RectObject* obj)
 	OutputDebugString(charBuffer);
 	*/
 	return result;
-	return result;
 }
 
-bool GameLevel::MoveLeft(int framesHeld, RectObject* obj)
+bool GameLevel::MoveLeft(int framesHeld, RectObject* obj, bool holdingDown)
 {
+
+
+	/*
 	bool result = false;
-	RectObject* temp = new RectObject(*obj);
+	RectObject* temp = RectObjectFactory::CreateNewRectObject(obj);
 
-	temp->MoveLeft(framesHeld);
+	temp->MoveRight(framesHeld, holdingDown);
 
-	// Check this >
+	//int* coords = RectObjectToGridCoords(*temp);
+	//coords[2] = coords[2] + 1;
 
-	MoveDown(framesHeld, obj);
+	wchar_t charBuffer[256];
+
+	if (temp->GetRight() < DEFAULT_WIDTH)
+	{
+		obj->Reposition(temp->GetLeft(), temp->GetTop());
+		obj->xVelocity.current = temp->xVelocity.current;
+		result = true;
+	}
+	else {
+		obj->Reposition(DEFAULT_WIDTH - temp->GetWidth(), temp->GetTop());
+		obj->xVelocity.current = 0;
+	}
+
+	delete temp;
+	//delete[] coords;
+
+	
+	return result;
+}
+	*/
+	bool result = false;
+	RectObject* temp = RectObjectFactory::CreateNewRectObject(obj);
+
+	temp->MoveLeft(framesHeld, holdingDown);
 
 	wchar_t charBuffer[256];
 
 	swprintf(charBuffer, 256, L"tempvel: %f\n", temp->xVelocity.current);
-	OutputDebugString(charBuffer);
+	//OutputDebugString(charBuffer);
 
 	swprintf(charBuffer, 256, L"obj vel before: %f\n", obj->xVelocity.current);
-	OutputDebugString(charBuffer);
+	//OutputDebugString(charBuffer);
 
 
 	//int* coords = RectObjectToGridCoords(*temp);
@@ -193,7 +213,7 @@ bool GameLevel::MoveLeft(int framesHeld, RectObject* obj)
 
 	if (temp->GetLeft() > 0)
 	{
-		obj->Reposition(temp->GetLeft(), obj->GetTop());
+		obj->Reposition(temp->GetLeft(), temp->GetTop());
 		obj->xVelocity.current = temp->xVelocity.current;
 		result = true;
 	}
@@ -203,28 +223,24 @@ bool GameLevel::MoveLeft(int framesHeld, RectObject* obj)
 	}
 
 	swprintf(charBuffer, 256, L"obj vel after: %f\n", obj->xVelocity.current);
-	OutputDebugString(charBuffer);
+	//OutputDebugString(charBuffer);
 
 	delete temp;
 	//delete[] coords;
 
 	swprintf(charBuffer, 256, L"final: %f\n", obj->xVelocity.current);
-	OutputDebugString(charBuffer);
+	//OutputDebugString(charBuffer);
 
 	return result;
 }
 
-bool GameLevel::MoveRight(int framesHeld, RectObject* obj)
+bool GameLevel::MoveRight(int framesHeld, RectObject* obj, bool holdingDown)
 {
+
 	bool result = false;
-	RectObject* temp = new RectObject(*obj);
+	RectObject* temp = RectObjectFactory::CreateNewRectObject(obj);
 
-	temp->MoveRight(framesHeld);
-
-	// Check this >
-
-	MoveDown(framesHeld, obj);
-
+	temp->MoveRight(framesHeld, holdingDown);
 
 	//int* coords = RectObjectToGridCoords(*temp);
 	//coords[2] = coords[2] + 1;
@@ -342,4 +358,36 @@ bool GameLevel::WillCollide(int *coords)
 	}
 
 	return false;
+}
+
+bool GameLevel::FreeFall(int framesHeld, RectObject* obj)
+{
+
+	bool result = false;
+	RectObject* temp = RectObjectFactory::CreateNewRectObject(obj);
+
+	temp->FreeFall(framesHeld);
+
+	if (temp->GetBottom() < DEFAULT_HEIGHT)
+	{
+		obj->Reposition(temp->GetLeft(), temp->GetTop());
+		obj->yVelocity.current = temp->yVelocity.current;
+		result = true;
+	}
+	else {
+
+		// This logic needs an overhaul when I work on collisions
+		obj->Reposition(temp->GetLeft(), DEFAULT_HEIGHT - temp->GetLength());
+
+		obj->isFalling = false;
+		obj->timeSpentFalling = 0;
+
+		result = false;
+	}
+
+	delete temp;
+
+
+	return result;
+
 }

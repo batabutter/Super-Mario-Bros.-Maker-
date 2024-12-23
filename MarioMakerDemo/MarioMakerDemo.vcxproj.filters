@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Conditional Headers">
+      <UniqueIdentifier>{5b949ae1-4f6c-4cca-ba8c-4779b394c024}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Demo.cpp">
@@ -42,12 +45,12 @@
     <ClCompile Include="Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Mario.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RectObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteSheet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demo.h">
@@ -59,18 +62,30 @@
     <ClInclude Include="GameLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LevelEditor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mario.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteSheet.h">
+      <Filter>Conditional Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>Conditional Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="RectObjectFactory.h">
+      <Filter>Conditional Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelEditor.h">
+      <Filter>Conditional Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="test.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="mario.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
