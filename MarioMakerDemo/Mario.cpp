@@ -8,7 +8,7 @@ float Mario::CalcHorizontalSpeed(int frame, bool holdingDown, float currSpeed)
 	{
 		// 9.091t + 0.039
 
-		newVel = 9.091f * ((float)frame / 60.0f) + 0.039;
+		newVel = 9.091f * ((float)frame / 60.0f) + 2.039;
 
 
 		if (newVel > xVelocity.target)
@@ -36,7 +36,7 @@ float Mario::CalcVerticalHighJump(int frame, bool holdingDown)
 	{
 		// -17.396x^{2}+15.209x\ +0.007
 
-		newSpeed = -17.396 * pow(t, 2) + 15.209*t + 0.007;
+		newSpeed = -17.396 * pow(t, 2) + 15.209*t + 2.007;
 
 	}
 	else {
@@ -58,6 +58,9 @@ bool Mario::MoveRight(int frame, bool holdingDown)
 	xVelocity.current = newVel;
 	Reposition(xLeft + newVel, GetTop());
 
+	// Change this
+	//isFalling = true;
+
 	return result;
 }
 
@@ -68,6 +71,9 @@ bool Mario::MoveLeft(int frame, bool holdingDown)
 	float newVel = CalcHorizontalSpeed(frame, holdingDown, (-1.0f) * xVelocity.current);
 	xVelocity.current = (-1.0f) *newVel;
 	Reposition(xLeft + xVelocity.current, GetTop());
+
+	// Change this
+	//isFalling = true;
 
 	return result;
 }
@@ -100,9 +106,17 @@ bool Mario::MoveUp(int frame, bool holdingDown)
 	yVelocity.current = newVel;
 
 	if (newVel >= 0)
-		Reposition(xLeft, GetTop() - newVel);
+	{
+		yVelocity.current = newVel;
+	}
 	else
+	{
 		result = false;
+		yVelocity.current = 0.0f;
+		isFalling = true;
+	}
+
+	Reposition(xLeft + xVelocity.current, GetTop() - newVel);
 
 	return result;
 }
@@ -118,7 +132,7 @@ bool Mario::FreeFall(int frame)
 
 
 	if (calc <= 0)
-		newVel = prevSpeed;
+		newVel = 0;
 	else
 	{
 		newVel = prevSpeed + CalcVerticalFallSpeed(frame);
@@ -138,7 +152,45 @@ float Mario::CalcVerticalFallSpeed(int frame)
 
 	float t = (float)frame / 60;
 
-	speed = -27.940 * pow(t, 2) - 1.057 * t + 2.477;
+	speed = -87.940 * pow(t, 2) - 1.057 * t + 2.477;
 
 	return speed;
+}
+
+
+// CollisionHandler(RectObject* obj)
+// Given a RectObject, we check if the object collides with another object. If so, we handle the collision. There may be more paramterds we should pass in the future, 
+// but for now this works
+bool Mario::CollisionHandler(RectObject* obj, MOVEMENTDIR dir)
+{
+
+	switch (dir)
+	{
+	case RIGHT:
+		// This is a BANDAID FIX. I will probably have to come up with a better solution later
+		Reposition(obj->GetLeft() - GetWidth() - 1, GetTop());
+		xVelocity.current = 0.0f;
+		break;
+	case LEFT:
+		Reposition(obj->GetRight(), GetTop());
+		xVelocity.current = 0.0f;
+		break;
+	case DOWN:
+		Reposition(xLeft, obj->GetTop() - GetLength());
+		yVelocity.current = 0.0f;
+		break;
+
+	case UP:
+		Reposition(xLeft, obj->GetBottom());
+		yVelocity.current = 0.0f;
+		break;
+	}
+
+	return true;
+}
+
+bool Mario::Update()
+{
+
+	return true;
 }

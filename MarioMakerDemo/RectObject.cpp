@@ -1,6 +1,8 @@
 #include "RectObject.h"
 #include <string>
 
+using namespace RectObjectData;
+
 bool RectObject::PointInsideRect(POINT *point, RectObject *rect)
 {
 	float pointX = point->x;
@@ -15,6 +17,9 @@ bool RectObject::PointInsideRect(POINT *point, RectObject *rect)
 
 bool RectObject::WillCollide(RectObject *obj1, RectObject *obj2)
 {
+
+	if (obj2 == nullptr)
+		return false;
 
 	bool result = false;
 
@@ -84,7 +89,8 @@ bool RectObject::Draw()
 {
 	bool result = true;
 
-	sprites->Draw(0, xLeft, yTop);
+	if (sprites != nullptr)
+		sprites->Draw(0, xLeft, yTop);
 
 	return result;
 }

@@ -6,6 +6,8 @@
 #include "LevelEditor.h"
 #include <vector>
 
+using namespace RectObjectData;
+
 /* GameLevel.h:
 * Stores all of the needed information for a level in the game. It holds the grid, and lists of objects that need to be drawn.
 * TODO: Make it so you can move and remove objects from the board, add functionality for other moveable objects, etc.
@@ -18,21 +20,13 @@ const int DEFAULT_WIDTH = 512;
 // The amount of pixels from segment to segment of the grid
 const int DEAULT_PIXEL_INTERVAL = 16;
 
-// The default background color of the grid will be white for now
-#define DEFAULT_BACKGROUND D2D1::ColorF(0.572f, 0.564f, 1.0f)
-
-/* pixel
-* Abstract representation of a pixel. Stores an rgb value and if it is current "occupied," basically if it is either the background or not.
-*/
-struct pixel 
-{
-	bool occupied = false;
-	D2D1_COLOR_F color = DEFAULT_BACKGROUND;
-};
+const float PIXEL_MOVEMENT_CHECK = 10;
 
 class GameLevel
 {
 private:
+
+	void CollisionCheckerLoop(RectObject* temp, RectObject *original);
 
 	// ShowGrid():
 	// This method draws the visual lines that are represented on the grid onto the window.

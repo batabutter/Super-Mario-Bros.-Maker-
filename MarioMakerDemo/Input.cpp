@@ -30,13 +30,9 @@ void Input::ProcessKeyboardInput(uint32_t VKCode, bool wasDown, bool isDown, Rec
 				keyboard.keys[DC_UP].successfulMove = successfulMove;
 
 				if (!keyboard.keys[DC_UP].successfulMove)
+				{
 					obj->isFalling = true;
-
-			}
-			else 
-			{
-				keyboard.keys[DC_UP].framesHeld = 0;
-				obj->isFalling = true;
+				}
 			}
 
 			break;
@@ -90,42 +86,61 @@ void Input::ProcessKeyboardInput(uint32_t VKCode, bool wasDown, bool isDown, Rec
 
 			break;
 		}
+		
+		// Continously update the state of the character. 
+		Update();
+		
+	}
+}
 
-		// This code is a little wonky, but I can fix it later
-		if (obj->xVelocity.current > 0 && !keyboard.keys[DC_RIGHT].isDown)
-		{
-			keyboard.keys[DC_RIGHT].framesReleased++;
-			currLevel->MoveRight(keyboard.keys[DC_RIGHT].framesReleased, obj, keyboard.keys[DC_RIGHT].isDown);
-		}
+void Input::Update()
+{
+	RectObject* obj = currLevel->GetCharacter();
+	bool successfulMove = true;
 
-		if (obj->xVelocity.current < 0 && !keyboard.keys[DC_LEFT].isDown)
-		{
-			// Experiment with this, but I think it has a minor bug
-
-			OutputDebugString(L"Trying to update > ");
-
-			wchar_t charBuffer[256];
-
-			swprintf(charBuffer, 256, L" final lvel: %f\n", obj->xVelocity.current);
-			OutputDebugString(charBuffer);
-
-			keyboard.keys[DC_LEFT].framesReleased++;
-			currLevel->MoveLeft(keyboard.keys[DC_LEFT].framesReleased, obj, keyboard.keys[DC_LEFT].isDown);
-		}
-
-		if (obj->isFalling) {
-			obj->timeSpentFalling++;
-			successfulMove = currLevel->FreeFall(obj->timeSpentFalling++, obj);
-		}
-
-		if (!keyboard.keys[DC_DOWN].successfulMove)
-		{
-			keyboard.keys[DC_UP].successfulMove = true;
-		}
-
-
-
+	// This code is a little wonky, but I can fix it later
+	if (obj->xVelocity.current > 0 && !keyboard.keys[DC_RIGHT].isDown)
+	{
+		keyboard.keys[DC_RIGHT].framesReleased++;
+		currLevel->MoveRight(keyboard.keys[DC_RIGHT].framesReleased, obj, keyboard.keys[DC_RIGHT].isDown);
 	}
 
+	if (obj->xVelocity.current < 0 && !keyboard.keys[DC_LEFT].isDown)
+	{
+		// Experiment with this, but I think it has a minor bug
 
+		OutputDebugString(L"Trying to update > ");
+
+		wchar_t charBuffer[256];
+
+		swprintf(charBuffer, 256, L" final lvel: %f\n", obj->xVelocity.current);
+		OutputDebugString(charBuffer);
+
+		keyboard.keys[DC_LEFT].framesReleased++;
+		currLevel->MoveLeft(keyboard.keys[DC_LEFT].framesReleased, obj, keyboard.keys[DC_LEFT].isDown);
+	}
+
+	if (!keyboard.keys[DC_UP].isDown)
+	{
+		keyboard.keys[DC_UP].framesHeld = 0;
+		obj->isFalling = true;
+	}
+
+	if (obj->isFalling) {
+		/*
+
+		wchar_t charBuffer[256];
+		swprintf_s(charBuffer, sizeof(charBuffer) / sizeof(wchar_t), L"Inside input >: %f\n", obj->GetBottom());
+		OutputDebugString(charBuffer);
+
+		*/
+		OutputDebugStringW(L"Freefalling\n");
+		obj->timeSpentFalling++;
+		successfulMove = currLevel->FreeFall(obj->timeSpentFalling++, obj);
+	}
+
+	if (!keyboard.keys[DC_DOWN].successfulMove)
+	{
+		keyboard.keys[DC_UP].successfulMove = true;
+	}
 }

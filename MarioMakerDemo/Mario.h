@@ -2,6 +2,8 @@
 
 #include "RectObject.h"
 
+using namespace RectObjectData;
+
 const float CHARACTER_MOVE_BY = 3.7f;
 const float DEFAULT_TARGET_VELOCITY = 3.7f;
 
@@ -12,7 +14,8 @@ const float DEFAULT_MARIO_JUMP_VELOCITY = -17.36f;
 
 const float DEFAULT_TARGET_FREEFALL = 3.7f;
 
-class Mario : public RectObject
+
+class Mario : public RectObjectData::RectObject
 {
 
 public:
@@ -30,7 +33,7 @@ public:
 		yVelocity = { 0.0f, DEFAULT_TARGET_VELOCITY };
 	};
 
-	Mario(const RectObject& obj) : RectObject(obj) {}
+	Mario(const RectObject& obj) : RectObject(obj) {};
 
 	bool MoveRight(int frame, bool holdingDown) override;
 	bool MoveLeft(int frame, bool holdingDown) override;
@@ -38,8 +41,13 @@ public:
 	bool MoveUp(int frame, bool holdingDown) override;
 	bool FreeFall(int frame) override;
 
+
 	float CalcHorizontalSpeed(int frame, bool holdingDown, float speed);
 	float CalcVerticalHighJump(int frame, bool holdingDown);
 
 	float CalcVerticalFallSpeed(int frame);
+
+	bool CollisionHandler(RectObject* obj, MOVEMENTDIR dir) override;
+
+	bool Update() override;
 };

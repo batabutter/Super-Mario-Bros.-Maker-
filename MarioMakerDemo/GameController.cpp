@@ -35,6 +35,9 @@ void GameController::LoadInitialLevel(GameLevel* level)
 	currentLevel->Init(graphics, character, xCharacterStart, yCharacterStart, levelEditor);
 	currentLevel->Load();
 
+	// For testing
+	currentLevel->AppendStaticRectObject(new RectObject(432.0f, 64.0f, 160.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, true));
+
 	// WE SET THE CHARACTER FALLING TO TRUE. PROBABLY CHAGNE THIS LATER
 
 	character->isFalling = true;
@@ -45,6 +48,7 @@ void GameController::LoadInitialLevel(GameLevel* level)
 
 	// No longer loading
 	loading = false;
+
 
 }
 void GameController::SwitchLevel(GameLevel* level)
@@ -102,12 +106,12 @@ int GameController::Init(HWND windowHandle)
 
 	GameController::timeInfo = new GameController::TimeInfo {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), std::chrono::duration<long long, std::milli>::duration() };
 
-	//level1->AppendStaticRectObject(block);
-
 
 	// Initialize the level editor and the input
 
 	levelEditor->Init(graphics);
+
+	return 1;
 }
 
 int GameController::UpdateGame()
@@ -143,9 +147,6 @@ int GameController::UpdateGame()
 		timeInfo->now = std::chrono::high_resolution_clock::now();
 		timeInfo->deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeInfo->now - timeInfo->lastUpdate);
 	}
-
-	if (isKeyDown)
-		OutputDebugString(L"IsDown");
 
 	/*
 

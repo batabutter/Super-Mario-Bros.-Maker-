@@ -48,6 +48,11 @@ void Demo::Render()
 void Demo::Update()
 {
 
+	// For now, just worry about updating Mario 
+
+	character->Update();
+
+
 }
 
 // Deconstructor:

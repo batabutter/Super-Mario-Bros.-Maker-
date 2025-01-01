@@ -4,6 +4,8 @@
 #include "Graphics.h"
 #include <vector>
 
+using namespace RectObjectData;
+
 class LevelEditor
 {
 

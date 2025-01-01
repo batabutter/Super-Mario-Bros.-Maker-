@@ -58,4 +58,5 @@ private:
 	Input() {}
 	static Input* instance;
 
+	static void Update();
 };

@@ -93,7 +93,12 @@ int* GameLevel::RectObjectToGridCoords(RectObject &obj)
 	*/
 
 	// Create the array
-	int *coords = new int[4]{ (int) (left/ DEAULT_PIXEL_INTERVAL), (int)(top / DEAULT_PIXEL_INTERVAL), (int)(right / DEAULT_PIXEL_INTERVAL), (int)(bottom / DEAULT_PIXEL_INTERVAL) };
+	int *coords = new int[4]{ 
+		(int) (floor(left/ DEAULT_PIXEL_INTERVAL)), 
+			(int)(floor(top / DEAULT_PIXEL_INTERVAL)), 
+			(int)(ceil(right / DEAULT_PIXEL_INTERVAL)), 
+			(int)(ceil(bottom / DEAULT_PIXEL_INTERVAL)) };
+
 
 	return coords;
 }
@@ -105,11 +110,29 @@ int* GameLevel::RectObjectToGridCoords(RectObject &obj)
 */
 bool GameLevel::MoveUp(int framesHeld, RectObject* obj, bool holdingDown)
 {
-	bool canMoveUp = true;
-	canMoveUp = obj->MoveUp(framesHeld, holdingDown);
+
+	wchar_t charBuffer[256];
+	swprintf_s(charBuffer, sizeof(charBuffer) / sizeof(wchar_t), L"Inside gamelevel before >: %f\n", obj->GetBottom());
+	OutputDebugString(charBuffer);
+	RectObject* temp = RectObjectFactory::CreateNewRectObject(obj);
+	bool result = true;
 
 
-	return canMoveUp;
+
+	result = temp->MoveUp(framesHeld, holdingDown);
+
+	CollisionCheckerLoop(temp, obj);
+
+	if (!result)
+		OutputDebugString(L"Move up failed\n");
+
+	if (temp->isFalling)
+		OutputDebugString(L"falling in temp\n");
+
+	swprintf_s(charBuffer, sizeof(charBuffer) / sizeof(wchar_t), L"Inside gamelevel after >: %f\n", obj->GetBottom());
+	OutputDebugString(charBuffer);
+
+	return result;
 }
 
 bool GameLevel::MoveDown(int framesHeld, RectObject* obj, bool holdingDown)
@@ -118,150 +141,35 @@ bool GameLevel::MoveDown(int framesHeld, RectObject* obj, bool holdingDown)
 	bool result = false;
 	RectObject* temp = RectObjectFactory::CreateNewRectObject(obj);
 
-	temp->MoveDown(framesHeld, holdingDown);
-
-	/*
-	wchar_t charBuffer[256];
-
-	swprintf(charBuffer, 256, L"tempvel: %f\n", temp->yVelocity.current);
-	OutputDebugString(charBuffer);
-
-	swprintf(charBuffer, 256, L"obj vel before: %f\n", obj->yVelocity.current);
-	OutputDebugString(charBuffer);
-
-	*/
-
-
-	//int* coords = RectObjectToGridCoords(*temp);
-	//coords[2] = coords[2] + 1;
-
-	if (temp->GetBottom() < DEFAULT_HEIGHT)
-	{
-		obj->Reposition(temp->GetLeft(), temp->GetTop());
-		obj->yVelocity.current = temp->yVelocity.current;
-		result = true;
-	}
-	else {
-		obj->Reposition(temp->GetLeft(), DEFAULT_HEIGHT - temp->GetLength());
-		obj->yVelocity.current = 0;
-	}
-
-	/*
-	swprintf(charBuffer, 256, L"obj vel after: %f\n", obj->yVelocity.current);
-	OutputDebugString(charBuffer);
-	*/
+	result = temp->MoveDown(framesHeld, holdingDown);
 
 	delete temp;
-	//delete[] coords;
 
-	/*
-	swprintf(charBuffer, 256, L"final: %f\n", obj->yVelocity.current);
-	OutputDebugString(charBuffer);
-	*/
 	return result;
 }
 
 bool GameLevel::MoveLeft(int framesHeld, RectObject* obj, bool holdingDown)
 {
-
-
-	/*
 	bool result = false;
 	RectObject* temp = RectObjectFactory::CreateNewRectObject(obj);
 
-	temp->MoveRight(framesHeld, holdingDown);
+	result = temp->MoveLeft(framesHeld, holdingDown);
 
-	//int* coords = RectObjectToGridCoords(*temp);
-	//coords[2] = coords[2] + 1;
-
-	wchar_t charBuffer[256];
-
-	if (temp->GetRight() < DEFAULT_WIDTH)
-	{
-		obj->Reposition(temp->GetLeft(), temp->GetTop());
-		obj->xVelocity.current = temp->xVelocity.current;
-		result = true;
-	}
-	else {
-		obj->Reposition(DEFAULT_WIDTH - temp->GetWidth(), temp->GetTop());
-		obj->xVelocity.current = 0;
-	}
+	CollisionCheckerLoop(temp, obj);
 
 	delete temp;
-	//delete[] coords;
-
-	
-	return result;
-}
-	*/
-	bool result = false;
-	RectObject* temp = RectObjectFactory::CreateNewRectObject(obj);
-
-	temp->MoveLeft(framesHeld, holdingDown);
-
-	wchar_t charBuffer[256];
-
-	swprintf(charBuffer, 256, L"tempvel: %f\n", temp->xVelocity.current);
-	//OutputDebugString(charBuffer);
-
-	swprintf(charBuffer, 256, L"obj vel before: %f\n", obj->xVelocity.current);
-	//OutputDebugString(charBuffer);
-
-
-	//int* coords = RectObjectToGridCoords(*temp);
-	//coords[2] = coords[2] + 1;
-
-	if (temp->GetLeft() > 0)
-	{
-		obj->Reposition(temp->GetLeft(), temp->GetTop());
-		obj->xVelocity.current = temp->xVelocity.current;
-		result = true;
-	}
-	else {
-		obj->Reposition(0, obj->GetTop());
-		obj->xVelocity.current = 0;
-	}
-
-	swprintf(charBuffer, 256, L"obj vel after: %f\n", obj->xVelocity.current);
-	//OutputDebugString(charBuffer);
-
-	delete temp;
-	//delete[] coords;
-
-	swprintf(charBuffer, 256, L"final: %f\n", obj->xVelocity.current);
-	//OutputDebugString(charBuffer);
-
 	return result;
 }
 
 bool GameLevel::MoveRight(int framesHeld, RectObject* obj, bool holdingDown)
 {
-
 	bool result = false;
 	RectObject* temp = RectObjectFactory::CreateNewRectObject(obj);
 
-	temp->MoveRight(framesHeld, holdingDown);
-
-	//int* coords = RectObjectToGridCoords(*temp);
-	//coords[2] = coords[2] + 1;
-
-	wchar_t charBuffer[256];
-
-	if (temp->GetRight() < DEFAULT_WIDTH)
-	{
-		obj->Reposition(temp->GetLeft(), temp->GetTop());
-		obj->xVelocity.current = temp->xVelocity.current;
-		result = true;
-	}
-	else {
-		obj->Reposition(DEFAULT_WIDTH - temp->GetWidth(), temp->GetTop());
-		obj->xVelocity.current = 0;
-	}
+	result = temp->MoveRight(framesHeld, holdingDown);
+	CollisionCheckerLoop(temp, obj);
 
 	delete temp;
-	//delete[] coords;
-
-	
 	return result;
 }
 
@@ -306,7 +214,7 @@ void GameLevel::AppendStaticRectObject(RectObject *rect)
 		int widthOfRect = rect->GetWidth();
 
 		pixel pixelToAdd;
-		pixelToAdd.occupied = true;
+		pixelToAdd.obj = rect;
 		pixelToAdd.color = D2D1::ColorF(rect->GetRed(), rect->GetGreen(), rect->GetBlue());
 
 		if (coords[1] < 0)
@@ -344,6 +252,7 @@ void GameLevel::ClearObjects()
 		delete objects.at(i);
 }
 
+// Overhaul or change in the future
 
 bool GameLevel::WillCollide(int *coords)
 {
@@ -353,7 +262,7 @@ bool GameLevel::WillCollide(int *coords)
 	for (int k = coords[1]; k < coords[3]; k++)
 	{
 		for (int j = coords[0]; j < coords[2]; j++)
-			if (grid[k][j].occupied == true)
+			if (grid[k][j].obj != nullptr)
 				return true;
 	}
 
@@ -363,19 +272,30 @@ bool GameLevel::WillCollide(int *coords)
 bool GameLevel::FreeFall(int framesHeld, RectObject* obj)
 {
 
+	wchar_t charBuffer[256];
+
 	bool result = false;
 	RectObject* temp = RectObjectFactory::CreateNewRectObject(obj);
 
+	// Create the projection of where the object will move to 
 	temp->FreeFall(framesHeld);
 
-	if (temp->GetBottom() < DEFAULT_HEIGHT)
-	{
-		obj->Reposition(temp->GetLeft(), temp->GetTop());
-		obj->yVelocity.current = temp->yVelocity.current;
-		result = true;
-	}
-	else {
+	int gridBottom = floor(temp->GetBottom() / DEAULT_PIXEL_INTERVAL);
 
+
+	if (gridBottom < gridColumns)
+	{
+		CollisionCheckerLoop(temp, obj);
+		/**
+		wchar_t charBuffer[256];
+		//swprintf_s(buffer, sizeof(buffer) / sizeof(wchar_t), L"Float value: %.2f\n", value);
+		swprintf_s(charBuffer, sizeof(charBuffer) / sizeof(wchar_t), L"Temp left>: %.2f\n", temp->GetLeft());
+		OutputDebugString(charBuffer);
+
+		*/
+	}
+	else 
+	{
 		// This logic needs an overhaul when I work on collisions
 		obj->Reposition(temp->GetLeft(), DEFAULT_HEIGHT - temp->GetLength());
 
@@ -387,7 +307,153 @@ bool GameLevel::FreeFall(int framesHeld, RectObject* obj)
 
 	delete temp;
 
-
 	return result;
 
+}
+
+void GameLevel::CollisionCheckerLoop(RectObject* temp, RectObject *original)
+{
+
+	wchar_t charBuffer[256];
+	//swprintf_s(buffer, sizeof(buffer) / sizeof(wchar_t), L"Float value: %.2f\n", value);
+
+	RectObject* collidingObj = nullptr;
+	int oldLeftPos = floor(original->GetLeft() / DEAULT_PIXEL_INTERVAL);
+	int oldRightPos = floor(original->GetRight() / DEAULT_PIXEL_INTERVAL);
+	int oldBottom = floor(original->GetBottom() / DEAULT_PIXEL_INTERVAL);
+	int oldTop = floor(original->GetTop() / DEAULT_PIXEL_INTERVAL);
+
+	int newLeftPos = floor(temp->GetLeft() / DEAULT_PIXEL_INTERVAL);
+	int newRightPos = floor(temp->GetRight() / DEAULT_PIXEL_INTERVAL);
+	int newBottom = floor(temp->GetBottom() / DEAULT_PIXEL_INTERVAL);
+	int newTop = floor(temp->GetTop() / DEAULT_PIXEL_INTERVAL);
+
+	float newXVel = temp->GetLeft() + temp->xVelocity.current;
+	float newYVel = temp->GetTop() - temp->yVelocity.current;
+
+
+	// I don't like this and I think it needs to be changed. I don't like having the adjustion check once
+	bool adjustion = false;
+
+	if (newBottom >= gridColumns)
+		// Band-aid fix
+		newBottom = newBottom - 1;
+
+	// First, check the horizontal movement based off the xVelocity and adjust accordingly
+
+	// If the object is moving right
+	swprintf_s(charBuffer, sizeof(charBuffer) / sizeof(wchar_t), L"right location of original>: %d\n", oldRightPos);
+	OutputDebugString(charBuffer);
+
+	if ((temp->GetRight() < DEFAULT_WIDTH) && !adjustion)
+	{
+
+		if (temp->xVelocity.current > 0)
+		{
+
+			if (grid[newTop][newRightPos].obj != nullptr)
+			{
+				collidingObj = grid[newTop][newRightPos].obj;
+			}
+			else if (grid[newBottom][newRightPos].obj != nullptr)
+			{
+
+				collidingObj = grid[newBottom][newRightPos].obj;
+			}
+
+			if (collidingObj != nullptr)
+			{
+				swprintf_s(charBuffer, sizeof(charBuffer) / sizeof(wchar_t), L"left location of obj>: %f\n", floor(collidingObj->GetLeft() / DEAULT_PIXEL_INTERVAL));
+				OutputDebugString(charBuffer);
+			}
+
+			if (collidingObj != nullptr && (oldRightPos <= floor(collidingObj->GetLeft() / DEAULT_PIXEL_INTERVAL)))
+			{
+				temp->CollisionHandler(collidingObj, MOVEMENTDIR::RIGHT);
+				adjustion = true;
+			}
+		}
+		// If the object is moving left
+		else if (temp->xVelocity.current < 0)
+		{
+			if (grid[newTop][newLeftPos].obj != nullptr)
+			{
+				collidingObj = grid[newTop][newLeftPos].obj;
+			}
+			else if (grid[newBottom][newLeftPos].obj != nullptr)
+			{
+				collidingObj = grid[newBottom][newLeftPos].obj;
+			}
+
+			if (collidingObj != nullptr && (oldLeftPos >= floor(collidingObj->GetRight() / DEAULT_PIXEL_INTERVAL)))
+			{
+				temp->CollisionHandler(collidingObj, MOVEMENTDIR::LEFT);
+				adjustion = true;
+			}
+		}
+	}
+	else if (temp->GetRight() >= DEFAULT_WIDTH)
+	{
+		temp->Reposition(DEFAULT_WIDTH - temp->GetWidth(), temp->GetTop());
+		temp->xVelocity.current = 0;
+
+		// Band-aid fix
+		newRightPos = (int) floor(temp->GetRight() / DEAULT_PIXEL_INTERVAL) - 1;
+	}
+
+	if (!adjustion)
+	{
+		// Next, check the vertical movement based off the yVelocity and adjust accordingly
+
+		if (temp->yVelocity.current > 0)
+		{
+			if (grid[newTop][newLeftPos].obj != nullptr)
+			{
+				collidingObj = grid[newTop][newLeftPos].obj;
+			}
+			else if (grid[newTop][newRightPos].obj != nullptr)
+			{
+				collidingObj = grid[newTop][newRightPos].obj;
+			}
+
+			if (collidingObj != nullptr)
+			{
+				temp->CollisionHandler(collidingObj, MOVEMENTDIR::UP);
+				adjustion = true;
+			}
+
+		}
+		else if (temp->yVelocity.current < 0)
+		{
+
+			if (grid[newBottom][newLeftPos].obj != nullptr)
+			{
+				collidingObj = grid[newBottom][newLeftPos].obj;
+			}
+			else if (grid[newBottom][newRightPos].obj != nullptr)
+			{
+				collidingObj = grid[newBottom][newRightPos].obj;
+			}
+
+			if (collidingObj != nullptr)
+			{
+
+				temp->CollisionHandler(collidingObj, MOVEMENTDIR::DOWN);
+				//temp->isFalling = false;
+				temp->timeSpentFalling = 0;
+				adjustion = true;
+			}
+			else {
+				temp->isFalling = true;
+			}
+
+		}
+
+	}
+
+	original->Reposition(temp->GetLeft(), temp->GetTop());
+	original->xVelocity.current = temp->xVelocity.current;
+	original->yVelocity.current = temp->yVelocity.current;
+	original->isFalling = temp->isFalling;
+	original->timeSpentFalling = temp->timeSpentFalling;
 }
