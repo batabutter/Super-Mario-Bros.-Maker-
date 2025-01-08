@@ -345,7 +345,9 @@ void GameLevel::CollisionCheckerLoop(RectObject* temp, RectObject *original)
 	swprintf_s(charBuffer, sizeof(charBuffer) / sizeof(wchar_t), L"right location of original>: %d\n", oldRightPos);
 	OutputDebugString(charBuffer);
 
-	if ((temp->GetRight() < DEFAULT_WIDTH) && !adjustion)
+
+	// I don't like this logic flow
+	if (temp->GetLeft() >= 0 && (temp->GetRight() < DEFAULT_WIDTH) && !adjustion)
 	{
 
 		if (temp->xVelocity.current > 0)
@@ -392,13 +394,23 @@ void GameLevel::CollisionCheckerLoop(RectObject* temp, RectObject *original)
 			}
 		}
 	}
-	else if (temp->GetRight() >= DEFAULT_WIDTH)
+	else 
 	{
-		temp->Reposition(DEFAULT_WIDTH - temp->GetWidth(), temp->GetTop());
-		temp->xVelocity.current = 0;
+		if (temp->GetRight() >= DEFAULT_WIDTH)
+		{
+			temp->Reposition(DEFAULT_WIDTH - temp->GetWidth(), temp->GetTop());
+			temp->xVelocity.current = 0;
 
-		// Band-aid fix
-		newRightPos = (int) floor(temp->GetRight() / DEAULT_PIXEL_INTERVAL) - 1;
+			// Band-aid fix
+			newRightPos = (int)floor(temp->GetRight() / DEAULT_PIXEL_INTERVAL) - 1;
+		}
+		else if (temp->GetLeft() < 0)
+		{
+
+			temp->Reposition(0, temp->GetTop());
+			temp->xVelocity.current = 0;
+		}
+			
 	}
 
 	if (!adjustion)
